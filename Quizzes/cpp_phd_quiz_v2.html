@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C++ PhD OOP Quiz — VSCode Edition</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ─── VARIABLES ─────────────────────────────── */
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --card: #1e1e1e;
+      /* VSCode Dark Background */
+      --border: #30363d;
+      --green: #2ea043;
+      --green-hover: #3fb950;
+      --red: #f85149;
+      --amber: #d29922;
+      --blue: #58a6ff;
+      --text: #c9d1d9;
+      --muted: #8b949e;
+      --dim: #21262d;
+      --mono: 'JetBrains Mono', monospace;
+      --syne: 'Syne', sans-serif;
+    }
+
+    /* ─── RESET ─────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      /* Increased base font size */
+    }
+
+    /* ─── TOPBAR ────────────────────────────────── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      height: 60px;
+      background: rgba(13, 17, 23, 0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 32px;
+    }
+
+    #topbar .brand {
+      font-family: var(--syne);
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--blue);
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    #topbar .brand em {
+      color: var(--muted);
+      font-style: normal;
+    }
+
+    #prog-track {
+      flex: 1;
+      height: 4px;
+      background: var(--dim);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    #prog-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      border-radius: 2px;
+      transition: width 0.45s ease;
+      box-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
+    }
+
+    #score-lbl {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    #score-lbl b {
+      color: var(--green);
+    }
+
+    #qnum-lbl {
+      font-size: 13px;
+      color: var(--muted);
+      flex-shrink: 0;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    /* ─── MAIN WRAPPER ──────────────────────────── */
+    #main {
+      max-width: 960px;
+      /* Increased width */
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+    }
+
+    /* ─── CARD ──────────────────────────────────── */
+    #card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      animation: rise 0.3s ease both;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Card header */
+    .c-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      background: #252526;
+      /* VSCode tab color */
+      border-bottom: 1px solid var(--border);
+    }
+
+    .c-qtag {
+      font-family: var(--syne);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--blue);
+      background: rgba(88, 166, 255, 0.1);
+      border: 1px solid rgba(88, 166, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .c-topic {
+      font-size: 14px;
+      font-weight: 500;
+      color: #cccccc;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Code section */
+    .c-code {
+      background: #1e1e1e;
+      /* VSCode Editor Background */
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .c-code-lang {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+      letter-spacing: 1px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .c-code pre {
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.6;
+      color: #d4d4d4;
+      /* VSCode default text */
+      overflow-x: auto;
+      white-space: pre;
+      tab-size: 4;
+    }
+
+    /* Prompt */
+    .c-prompt {
+      padding: 16px 24px 12px;
+      font-size: 14px;
+      color: #cccccc;
+      background: #252526;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .c-prompt strong {
+      color: var(--blue);
+    }
+
+    /* Options */
+    .c-opts {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      /* Increased gap */
+      background: #1e1e1e;
+    }
+
+    .opt-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      width: 100%;
+      padding: 16px 20px;
+      /* Larger hit area */
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #252526;
+      color: #d4d4d4;
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .opt-btn:hover:not([disabled]) {
+      border-color: var(--blue);
+      background: #2d2d30;
+    }
+
+    .opt-btn[disabled] {
+      cursor: default;
+    }
+
+    .opt-lbl {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--muted);
+      flex-shrink: 0;
+      min-width: 20px;
+      padding-top: 1px;
+    }
+
+    .opt-val {
+      color: #ce9178;
+      /* VSCode string color */
+      word-break: break-word;
+    }
+
+    /* Option result states */
+    .opt-correct {
+      border-color: var(--green) !important;
+      background: rgba(46, 160, 67, 0.1) !important;
+    }
+
+    .opt-correct .opt-lbl,
+    .opt-correct .opt-val {
+      color: var(--green) !important;
+    }
+
+    .opt-wrong {
+      border-color: var(--red) !important;
+      background: rgba(248, 81, 73, 0.1) !important;
+    }
+
+    .opt-wrong .opt-lbl,
+    .opt-wrong .opt-val {
+      color: var(--red) !important;
+      text-decoration: line-through;
+    }
+
+    .opt-dim {
+      opacity: 0.4;
+    }
+
+    /* Feedback row */
+    .c-feedback {
+      display: none;
+      margin: 0 24px 16px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .c-feedback.visible {
+      display: flex;
+    }
+
+    .fb-pass {
+      background: rgba(46, 160, 67, 0.15);
+      border: 1px solid rgba(46, 160, 67, 0.4);
+      color: var(--green);
+    }
+
+    .fb-fail {
+      background: rgba(248, 81, 73, 0.15);
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      color: var(--red);
+    }
+
+    .fb-ico {
+      font-size: 18px;
+    }
+
+    /* Explanation */
+    .c-expl {
+      display: none;
+      margin: 0 24px 24px;
+      padding: 18px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #cccccc;
+      background: rgba(88, 166, 255, 0.08);
+      border: 1px solid rgba(88, 166, 255, 0.2);
+    }
+
+    .c-expl.visible {
+      display: block;
+    }
+
+    .expl-hd {
+      font-family: var(--syne);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--blue);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .c-expl code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #4ec9b0;
+      font-size: 13.5px;
+      font-family: var(--mono);
+    }
+
+    /* ─── NAV ROW ───────────────────────────────── */
+    #nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .nav-btn {
+      font-family: var(--mono);
+      font-size: 15px;
+      /* Larger Button text */
+      font-weight: 700;
+      padding: 14px 32px;
+      /* Thicker, wider buttons */
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-btn:hover:not([disabled]) {
+      border-color: var(--muted);
+      background: #21262d;
+    }
+
+    .nav-btn[disabled] {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.accent {
+      border-color: var(--blue);
+      background: rgba(88, 166, 255, 0.1);
+      color: var(--blue);
+    }
+
+    .nav-btn.accent:hover:not([disabled]) {
+      background: rgba(88, 166, 255, 0.2);
+      box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* Dot map */
+    #dots {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .dot:hover {
+      transform: scale(1.4);
+      background: var(--muted);
+    }
+
+    .dot.d-cur {
+      background: var(--blue);
+      box-shadow: 0 0 10px rgba(88, 166, 255, 0.8);
+      transform: scale(1.3);
+    }
+
+    .dot.d-ok {
+      background: var(--green);
+      opacity: 0.6;
+    }
+
+    .dot.d-bad {
+      background: var(--red);
+      opacity: 0.7;
+    }
+
+    /* ─── FINAL ─────────────────────────────────── */
+    #final {
+      display: none;
+      text-align: center;
+      padding: 60px 20px 100px;
+      animation: rise 0.4s ease both;
+    }
+
+    .fin-h {
+      font-family: var(--syne);
+      font-size: 40px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .fin-pct {
+      font-family: var(--syne);
+      font-size: 100px;
+      font-weight: 800;
+      line-height: 1;
+      margin: 20px 0 10px;
+    }
+
+    .fin-msg {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 48px;
+    }
+
+    .fin-grid {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .fin-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 36px;
+      min-width: 130px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .fin-num {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .fin-lbl {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .fin-btn {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px 48px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid var(--blue);
+      background: rgba(88, 166, 255, 0.1);
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .fin-btn:hover {
+      background: rgba(88, 166, 255, 0.2);
+      box-shadow: 0 0 24px rgba(88, 166, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ─── SCROLLBAR ─────────────────────────────── */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="topbar">
+    <div class="brand">C<em>++</em> PhD <em>|</em> VSCode Edition</div>
+    <div id="prog-track">
+      <div id="prog-fill"></div>
+    </div>
+    <div id="score-lbl">Score&nbsp;<b id="sc">0</b>/15</div>
+    <div id="qnum-lbl">Q<span id="qn">1</span>/15</div>
+  </div>
+
+  <div id="main">
+    <div id="quiz">
+      <div id="card"></div>
+      <div id="nav">
+        <button class="nav-btn" id="btn-prev" onclick="go(-1)">&#8592; Prev</button>
+        <div id="dots"></div>
+        <button class="nav-btn accent" id="btn-next" onclick="go(1)">Next &#8594;</button>
+      </div>
+    </div>
+    <div id="final"></div>
+  </div>
+
+  <script>
+    /* ══════════════════════════════════════════════════════
+       QUESTIONS
+       correct: 0=A  1=B  2=C  3=D
+    ══════════════════════════════════════════════════════ */
+    const Q = [
+
+      /* Q1 ── correct: 1 (B) ──────────────────────── */
+      {
+        topic: "Virtual Inheritance — Shared Base Mutation Chain",
+        code:
+          `#include <iostream>
+using namespace std;
+struct V {
+    int n;
+    V(int x) : n(x) { cout << "V" << n; }
+    virtual int f()  { return n; }
+};
+struct A : virtual V {
+    int a;
+    A(int x) : V(x+1), a(x) { n += a; cout << "A"; }
+    int f() override { return V::f() + a; }
+};
+struct B : virtual V {
+    int b;
+    B(int x) : V(x+2), b(x) { n *= b; cout << "B"; }
+    int f() override { return V::f() * b; }
+};
+struct C : A, B {
+    C(int x) : V(x), A(x), B(x) { cout << "C"; }
+    int f() override { return A::f() + B::f(); }
+};
+int main() {
+    C c(3);
+    cout << " ";
+    cout << c.f() << " ";
+    V* vp = &c;
+    cout << vp->f();
+    return 0;
+}`,
+        opts: [
+          `V4ABC 35 35`,
+          `V3ABC 75 75`,
+          `V3ABC 42 75`,
+          `V3ABC 75 42`
+        ],
+        correct: 1,
+        expl: `Virtual <code>V</code> is constructed once by <code>C</code> with <code>V(3)</code>, n=3. <code>A(3)</code> body: n+=a=3 → n=6. <code>B(3)</code> body: n*=b=3 → n=18. <code>C::f()</code>=<code>A::f()+B::f()</code>. <code>A::f()</code>=V::f()+a=18+3=21. <code>B::f()</code>=V::f()*b=18*3=54. Total=75. Virtual dispatch via <code>V*</code> also gives 75.`
+      },
+
+      /* Q2 ── correct: 2 (C) ──────────────────────── */
+      {
+        topic: "Default Args — 3-Level, Formula a*b-a-b",
+        code:
+          `#include <iostream>
+using namespace std;
+class X {
+public:
+    virtual void op(int a=2, int b=3) {
+        cout << "X:" << a*b << " ";
+    }
+    virtual ~X(){}
+};
+class Y : public X {
+public:
+    void op(int a=4, int b=5) override {
+        cout << "Y:" << a+b << " ";
+    }
+};
+class Z : public Y {
+public:
+    void op(int a=6, int b=7) override {
+        cout << "Z:" << (a*b - a - b) << " ";
+    }
+};
+int main() {
+    Z z;
+    X* px = &z;
+    Y* py = &z;
+    Z* pz = &z;
+    px->op();
+    py->op();
+    pz->op();
+    px->op(1);
+    py->op(1);
+    return 0;
+}`,
+        opts: [
+          `X:6 Y:9 Z:29 X:3 Y:6`,
+          `Z:29 Z:29 Z:29 Z:-1 Z:-1`,
+          `Z:1 Z:11 Z:29 Z:-1 Z:-1`,
+          `Z:1 Z:11 Z:29 Z:2 Z:4`
+        ],
+        correct: 2,
+        expl: `Virtual dispatch always calls <code>Z::op</code>, but default arguments are resolved at compile-time from the static pointer type. <code>px->op()</code>: a=2,b=3 → 2*3-2-3=1. <code>py->op()</code>: a=4,b=5 → 20-9=11. <code>pz->op()</code>: a=6,b=7 → 42-13=29. <code>px->op(1)</code>: a=1, b=3(X) → 3-4=-1. <code>py->op(1)</code>: a=1, b=5(Y) → 5-6=-1.`
+      },
+
+      /* Q3 ── correct: 0 (A) ──────────────────────── */
+      {
+        topic: "Object Slicing — Virtual name() Through label()",
+        code:
+          `#include <iostream>
+using namespace std;
+class Shape {
+public:
+    int id;
+    Shape(int i) : id(i) {}
+    virtual string name() const { return "S"; }
+    string label() const { return name() + to_string(id); }
+    void print() { cout << label() << " "; }
+};
+class Circle : public Shape {
+public:
+    Circle(int i) : Shape(i) {}
+    string name() const override { return "C"; }
+};
+class Square : public Shape {
+public:
+    Square(int i) : Shape(i) {}
+    string name() const override { return "Q"; }
+};
+void byVal(Shape s)  { s.print(); }
+void byRef(Shape& s) { s.print(); }
+int main() {
+    Circle c(5);
+    Square q(7);
+    byVal(c);
+    byRef(c);
+    byVal(q);
+    Shape* p = &q;
+    p->print();
+    cout << c.label();
+    return 0;
+}`,
+        opts: [
+          `S5 C5 S7 Q7 C5`,
+          `C5 C5 Q7 Q7 C5`,
+          `S5 C5 S7 S7 C5`,
+          `S5 S5 S7 Q7 Q7`
+        ],
+        correct: 0,
+        expl: `<code>byVal(c)</code>: slices to a <code>Shape</code> copy — vtable points to Shape → <code>name()</code>="S" → "S5". <code>byRef(c)</code>: no copy, Circle vtable intact → "C5". <code>byVal(q)</code>: sliced → "S7". <code>p->print()</code>: <code>print()</code> is non-virtual (static→Shape), but inside it calls <code>label()</code> then <code>name()</code> which IS virtual via <code>this</code> → Square vtable → "Q7". <code>c.label()</code>: virtual → "C5".`
+      },
+
+      /* Q4 ── correct: 3 (D) ──────────────────────── */
+      {
+        topic: "Exception in Constructor — Partial Object, No ~Dtor",
+        code:
+          `#include <iostream>
+using namespace std;
+struct M {
+    char c;
+    M(char v) : c(v) { cout << '+' << c; }
+    ~M()             { cout << '-' << c; }
+};
+class Bomb {
+    M m1, m2, m3, m4;
+public:
+    Bomb() : m1('A'), m2('B'), m3('C'), m4('D') {
+        cout << '!';
+        throw runtime_error("x");
+    }
+    ~Bomb() { cout << '~'; }
+};
+class Container {
+    M   pre;
+    Bomb* b;
+    M   post;
+public:
+    Container() : pre('P'), b(new Bomb()), post('Q') {
+        cout << "OK";
+    }
+    ~Container() { delete b; cout << "~Con"; }
+};
+int main() {
+    try { Container con; }
+    catch(...) { cout << "CATCH"; }
+    return 0;
+}`,
+        opts: [
+          `+P+A+B+C+D!~-D-C-B-A-PCATCH`,
+          `+P+A+B+C+D!-D-C-B-A~Con-PCATCH`,
+          `+P+A+B+C+D!-D-C-B-A-P~ConCATCH`,
+          `+P+A+B+C+D!-D-C-B-A-PCATCH`
+        ],
+        correct: 3,
+        expl: `<code>Container</code> inits members in declaration order: pre('P')→"+P", then <code>new Bomb()</code>. Bomb builds m1..m4 (+A+B+C+D), prints '!', throws. Bomb never fully constructed → <code>~Bomb</code> NOT called. Bomb's members destroyed in reverse: m4→"-D", m3→"-C", m2→"-B", m1→"-A". <code>new</code> throws, so <code>b</code> is never assigned; post('Q') never reached. Container never fully constructed → <code>~Container</code> NOT called. Only <code>pre</code> (fully constructed) is destroyed: "-P". Then catch→"CATCH".`
+      },
+
+      /* Q5 ── correct: 1 (B) ──────────────────────── */
+      {
+        topic: "Private Virtual + Static Counter Shared Across Instances",
+        code:
+          `#include <iostream>
+using namespace std;
+class Engine {
+    static int calls;
+    virtual int power() const { return 100; }
+public:
+    int run() { ++calls; return power() * calls; }
+    static int total() { return calls; }
+    virtual ~Engine(){}
+};
+int Engine::calls = 0;
+class Turbo : public Engine {
+    int boost;
+    int power() const override { return 150 + boost; }
+public:
+    Turbo(int b) : boost(b) {}
+};
+class NitrO : public Turbo {
+    int power() const override { return Turbo::power() * 2; }
+public:
+    NitrO(int b) : Turbo(b) {}
+};
+int main() {
+    Engine e; Turbo t(50); NitrO n(50);
+    Engine* arr[3] = {&e, &t, &n};
+    for(auto p : arr) cout << p->run() << " ";
+    cout << Engine::total() << " ";
+    for(auto p : arr) cout << p->run() << " ";
+    return 0;
+}`,
+        opts: [
+          `100 200 300 3 400 500 600`,
+          `100 400 1200 3 400 1000 2400`,
+          `100 400 2400 3 400 2000 4800`,
+          `100 400 1200 6 400 1000 2400`
+        ],
+        correct: 1,
+        expl: `<code>Engine::calls</code> is a static shared across all instances. Round 1: e.run()→calls=1, Engine::power=100→100*1=100. t.run()→calls=2, Turbo::power=200→200*2=400. n.run()→calls=3, NitrO::power=Turbo::power()*2=400→400*3=1200. total()=3. Round 2: calls=4→100*4=400; calls=5→200*5=1000; calls=6→400*6=2400.`
+      },
+
+      /* Q6 ── correct: 2 (C) ──────────────────────── */
+      {
+        topic: "Virtual Diamond — Mutation then Dual calc()",
+        code:
+          `#include <iostream>
+using namespace std;
+class Root {
+public:
+    int v;
+    Root(int x) : v(x) { cout << "R" << v; }
+    virtual int calc() { return v; }
+};
+class Left : virtual public Root {
+public:
+    Left(int x) : Root(x*2) { cout << "L"; v += 1; }
+    int calc() override { return v * 2; }
+};
+class Right : virtual public Root {
+public:
+    Right(int x) : Root(x*3) { cout << "R2"; v += 10; }
+    int calc() override { return v + 100; }
+};
+class Merge : public Left, public Right {
+public:
+    Merge(int x) : Root(x), Left(x), Right(x) { cout << "M"; }
+    int calc() override {
+        return Left::calc() + Right::calc() - v;
+    }
+};
+int main() {
+    Merge m(5);
+    cout << " ";
+    Root* rp = &m;
+    cout << m.calc() << " ";
+    cout << rp->calc() << " ";
+    cout << m.v;
+    return 0;
+}`,
+        opts: [
+          `R10LR2M 132 132 16`,
+          `R5LR2M 48 132 16`,
+          `R5LR2M 132 132 16`,
+          `R5LR2M 132 16 16`
+        ],
+        correct: 2,
+        expl: `Virtual <code>Root(5)</code> → v=5. <code>Left</code> body: v+=1=6. <code>Right</code> body: v+=10=16. <code>Merge::calc()</code> = <code>Left::calc()+Right::calc()-v</code> = (16*2)+(16+100)-16 = 32+116-16 = 132. Virtual dispatch via <code>Root*</code> also yields 132. m.v=16.`
+      },
+
+      /* Q7 ── correct: 3 (D) ──────────────────────── */
+      {
+        topic: "Covariant Returns + typeid + Cross Dynamic-Cast",
+        code:
+          `#include <iostream>
+#include <typeinfo>
+using namespace std;
+class A {
+public:
+    virtual A* clone() { return new A(*this); }
+    virtual void id()  { cout << "A "; }
+    virtual ~A(){}
+};
+class B : public A {
+public:
+    B* clone() override { return new B(*this); }
+    void id()  override { cout << "B "; }
+};
+class C : public B {
+public:
+    C* clone() override { return new C(*this); }
+    void id()  override { cout << "C "; }
+};
+int main() {
+    C c;
+    A* ap = &c;
+    A* cl1 = ap->clone();
+    B* cl2 = dynamic_cast<B*>(ap)->clone();
+    cl1->id();
+    cl2->id();
+    cout << (typeid(*cl1) == typeid(C)) << " ";
+    cout << (typeid(*cl2) == typeid(C)) << " ";
+    cout << (typeid(*cl1) == typeid(*cl2)) << " ";
+    cout << (dynamic_cast<C*>(cl1) != nullptr);
+    delete cl1; delete cl2;
+    return 0;
+}`,
+        opts: [
+          `C C 1 1 0 1`,
+          `C C 1 0 0 1`,
+          `A C 0 1 0 0`,
+          `C C 1 1 1 1`
+        ],
+        correct: 3,
+        expl: `<code>ap->clone()</code>: virtual → <code>C::clone()</code> → new C. <code>dynamic_cast&lt;B*&gt;(ap)</code>: succeeds (C IS-A B). Then <code>->clone()</code>: virtual on C object → <code>C::clone()</code>. Both <code>cl1</code> and <code>cl2</code> point to C objects. <code>id()</code>→"C" both. All typeid comparisons: C==C→1. <code>dynamic_cast&lt;C*&gt;(cl1)</code>: cl1 points to C → non-null→1.`
+      },
+
+      /* Q8 ── correct: 0 (A) ──────────────────────── */
+      {
+        topic: "Init-List Order vs Declaration Order — const + Reference",
+        code:
+          `#include <iostream>
+using namespace std;
+class Config {
+    const int limit;
+    int&      ref;
+    int       val;
+public:
+    Config(int L, int& r)
+        : val(r * 2), limit(L + 1), ref(r)
+    {
+        ref *= 3;
+        cout << limit << " " << ref << " " << val << " ";
+    }
+};
+int main() {
+    int x = 7;
+    Config cfg(9, x);
+    cout << x;
+    return 0;
+}`,
+        opts: [
+          `10 21 14 21`,
+          `10 7 14 21`,
+          `10 21 21 21`,
+          `9 21 14 21`
+        ],
+        correct: 0,
+        expl: `Declaration order overrides init-list text order. <code>limit</code>=L+1=10 (first). <code>ref</code> binds to x (second). <code>val</code>=r*2=7*2=14 (third — r is still 7 before body executes). Body: <code>ref*=3</code> → x=21, ref reads 21. Print: 10, 21, 14. After constructor: x=21.`
+      },
+
+      /* Q9 ── correct: 1 (B) ──────────────────────── */
+      {
+        topic: "3-Level Destructor — Tag Trick (upper→lower)",
+        code:
+          `#include <iostream>
+using namespace std;
+struct Tag {
+    char c;
+    Tag(char v) : c(v) { cout << c; }
+    ~Tag()             { cout << (char)(c | 32); }
+};
+class A {
+    Tag t;
+public:
+    A()  : t('A') { cout << '{'; }
+    virtual ~A()  { cout << '}'; }
+};
+class B : public A {
+    Tag t1, t2;
+public:
+    B()  : t1('B'), t2('C') { cout << '['; }
+    ~B()                    { cout << ']'; }
+};
+class C : public B {
+    Tag t;
+public:
+    C()  : t('D') { cout << '('; }
+    ~C()          { cout << ')'; }
+};
+int main() {
+    A* p = new C();
+    cout << "|";
+    delete p;
+    return 0;
+}`,
+        opts: [
+          `A{BC[D(|)d]bc}a`,
+          `A{BC[D(|)d]cb}a`,
+          `A{BC[D(|)dcb]}a`,
+          `A{BC[D(|)dcba]}`
+        ],
+        correct: 1,
+        expl: `Construction: A→t('A')→'A', body→'{'; B→t1('B')→'B', t2('C')→'C', body→'['; C→t('D')→'D', body→'('. Gives "A{BC[D(". Deletion (virtual chain): ~C body→')', ~C::t→'d'; ~B body→']', ~B::t2→'c', ~B::t1→'b'; ~A body→'}', ~A::t→'a'. Gives ")d]cb}a".`
+      },
+
+      /* Q10 ── correct: 3 (D) ─────────────────────── */
+      {
+        topic: "Non-Virtual nv() Explicitly Calls Virtual v() — 3 Levels",
+        code:
+          `#include <iostream>
+using namespace std;
+class P {
+public:
+    virtual void v() { cout << "Pv "; }
+    void nv()        { cout << "Pnv:"; v(); }
+};
+class Q : public P {
+public:
+    void v() override { cout << "Qv "; }
+    void nv()         { cout << "Qnv:"; P::nv(); }
+};
+class R : public Q {
+public:
+    void v() override { cout << "Rv "; }
+};
+int main() {
+    R r;
+    P* p = &r;
+    Q* q = &r;
+    r.v();
+    r.nv();
+    p->v();
+    p->nv();
+    q->v();
+    q->nv();
+    return 0;
+}`,
+        opts: [
+          `Rv Qnv:Pnv:Qv Rv Pnv:Rv Rv Qnv:Pnv:Rv`,
+          `Rv Qnv:Pnv:Rv Rv Pnv:Qv Rv Qnv:Pnv:Rv`,
+          `Rv Qnv:Pnv:Rv Rv Pnv:Rv Qv Qnv:Pnv:Rv`,
+          `Rv Qnv:Pnv:Rv Rv Pnv:Rv Rv Qnv:Pnv:Rv`
+        ],
+        correct: 3,
+        expl: `<code>r.v()</code>→R::v. <code>r.nv()</code>: R has none, finds Q::nv→"Qnv:" then P::nv→"Pnv:" then virtual <code>v()</code>→R::v→"Rv". <code>p->v()</code>→virtual→R::v. <code>p->nv()</code>: non-virtual, static P*→P::nv→"Pnv:" then virtual v()→"Rv". <code>q->v()</code>→virtual→R::v. <code>q->nv()</code>: static Q*→Q::nv→"Qnv:"+P::nv→"Pnv:"+virtual v()→"Rv".`
+      },
+
+      /* Q11 ── correct: 2 (C) ─────────────────────── */
+      {
+        topic: "Multiple Inheritance — op+(const X&) Hiding vs Overriding",
+        code:
+          `#include <iostream>
+using namespace std;
+class Writer {
+public:
+    virtual void write(int x)  { cout << "W:" << x << " "; }
+            void write(double x){ cout << "Wd:" << (int)x << " "; }
+};
+class Logger {
+public:
+    virtual void write(int x)  { cout << "L:" << x << " "; }
+    virtual ~Logger(){}
+};
+class Combined : public Writer, public Logger {
+public:
+    void write(int x) override {
+        cout << "C:" << x*2 << " ";
+    }
+};
+int main() {
+    Combined c;
+    Writer* wp = &c;
+    Logger* lp = &c;
+    c.write(5);
+    wp->write(5);
+    lp->write(5);
+    wp->write(2.5);
+    c.Writer::write(2.5);
+    return 0;
+}`,
+        opts: [
+          `C:10 C:10 L:5 Wd:2 Wd:2`,
+          `C:10 W:5 L:5 Wd:2 Wd:2`,
+          `C:10 C:10 C:10 Wd:2 Wd:2`,
+          `C:10 C:10 C:10 C:5 Wd:2`
+        ],
+        correct: 2,
+        expl: `<code>Combined::write(int)</code> overrides both <code>Writer::write(int)</code> and <code>Logger::write(int)</code> vtable slots. All three integer calls dispatch to "C:10". <code>wp->write(2.5)</code>: <code>write(double)</code> is NOT virtual — static type <code>Writer*</code> → <code>Writer::write(double)</code>→"Wd:2". Explicit <code>c.Writer::write(2.5)</code> same path.`
+      },
+
+      /* Q12 ── correct: 0 (A) ─────────────────────── */
+      {
+        topic: "Pure-Virtual Body + NVI Transform Chain",
+        code:
+          `#include <iostream>
+using namespace std;
+class Base {
+public:
+    virtual int core() = 0;
+    virtual int wrap(int x) { return core() + x; }
+    void execute(int x) { cout << wrap(x) << " "; }
+    virtual ~Base(){}
+};
+int Base::core() { return 500; }
+class Mid : public Base {
+public:
+    int core() override { return Base::core() / 5; }
+    int wrap(int x) override { return Base::wrap(x) * 2; }
+};
+class Top : public Mid {
+public:
+    int core() override { return Mid::core() + 50; }
+};
+int main() {
+    Top t;
+    Base* bp = &t;
+    Mid* mp = &t;
+    cout << t.core() << " ";
+    cout << t.wrap(10) << " ";
+    bp->execute(10);
+    mp->execute(10);
+    return 0;
+}`,
+        opts: [
+          `150 320 320 320`,
+          `150 320 160 320`,
+          `100 320 320 160`,
+          `150 160 320 320`
+        ],
+        correct: 0,
+        expl: `<code>t.core()</code>=<code>Mid::core()+50</code>=100+50=150. <code>t.wrap(10)</code>=<code>Mid::wrap(10)</code>=<code>Base::wrap(10)*2</code>; inside <code>Base::wrap</code> calls virtual <code>core()</code>→<code>Top::core()</code>=150; 150+10=160; *2=320. <code>bp->execute(10)</code> and <code>mp->execute(10)</code>: <code>execute</code> is non-virtual (Base::execute), calls virtual <code>wrap(10)</code>→<code>Mid::wrap</code>=320 both times.`
+      },
+
+      /* Q13 ── correct: 1 (B) ─────────────────────── */
+      {
+        topic: "Virtual operator= Signature Mismatch — Not an Override",
+        code:
+          `#include <iostream>
+using namespace std;
+class Num {
+public:
+    int x;
+    Num(int v) : x(v){}
+    virtual Num& operator=(const Num& o) {
+        cout << "N= "; x = o.x; return *this;
+    }
+    virtual void show() const { cout << "N:" << x << " "; }
+};
+class BigNum : public Num {
+public:
+    int y;
+    BigNum(int v, int w) : Num(v), y(w){}
+    BigNum& operator=(const BigNum& o) {
+        cout << "B= "; Num::operator=(o); y = o.y; return *this;
+    }
+    void show() const override { cout << "B:" << x << "," << y << " "; }
+};
+int main() {
+    BigNum b1(1,2), b2(3,4);
+    Num* p1 = &b1;
+    Num* p2 = &b2;
+    *p1 = *p2;
+    b1.show();
+    b2.show();
+    b1 = b2;
+    b1.show();
+    return 0;
+}`,
+        opts: [
+          `N= B:3,4 B:3,4 B= N= B:3,4`,
+          `N= B:3,2 B:3,4 B= N= B:3,4`,
+          `B= N= B:3,4 B:3,4 B= N= B:3,4`,
+          `N= B:3,4 B:3,4 N= B:3,4`
+        ],
+        correct: 1,
+        expl: `<code>BigNum::op=(const BigNum&)</code> has a different signature than <code>Num::op=(const Num&)</code> — it hides but does NOT override the virtual. So <code>*p1 = *p2</code> calls <code>Num::op=</code>→"N=", only x is copied: b1.x=3, b1.y stays 2. <code>b1.show()</code>→"B:3,2". Then <code>b1 = b2</code>: static type BigNum → <code>BigNum::op=</code>→"B= N=", b1.y=4. Final: "B:3,4".`
+      },
+
+      /* Q14 ── correct: 3 (D) ─────────────────────── */
+      {
+        topic: "Copy Elision (C++17) + Virtual get() in Sub",
+        code:
+          `#include <iostream>
+using namespace std;
+struct Obj {
+    int id;
+    static int cnt;
+    Obj()           : id(++cnt) { cout << "C" << id; }
+    Obj(const Obj&) : id(++cnt) { cout << "K" << id; }
+    Obj(Obj&&)      : id(++cnt) { cout << "M" << id; }
+    virtual ~Obj()              { cout << "D" << id; }
+    virtual int get() const     { return id; }
+};
+int Obj::cnt = 0;
+struct Sub : Obj {
+    Sub()            : Obj()  { cout << "s"; }
+    Sub(const Sub& o): Obj(o) { cout << "t"; }
+    int get() const override  { return Obj::get() * 10; }
+};
+Obj make() { return Obj(); }
+int main() {
+    Sub a;
+    Obj b = make();
+    Sub c = a;
+    cout << "|";
+    cout << a.get() << " " << b.get() << " " << c.get();
+    return 0;
+}`,
+        opts: [
+          `C1sC2K2t|10 2 20D2D2D1`,
+          `C1sC2M2K3t|10 2 30D3D2D1`,
+          `C1sK2tC3|10 3 20D3D2D1`,
+          `C1sC2K3t|10 2 30D3D2D1`
+        ],
+        correct: 3,
+        expl: `<code>Sub a</code>: Obj()→C1, Sub body→'s'. <code>Obj b=make()</code>: mandatory copy elision (C++17), Obj constructed in-place→C2. <code>Sub c=a</code>: Sub copy ctor calls Obj(a)→K3, body→'t'. a.get()=1*10=10; b.get()=2 (b is Obj, not Sub); c.get()=3*10=30. Destructors LIFO: D3, D2, D1.`
+      },
+
+      /* Q15 ── correct: 2 (C) ─────────────────────── */
+      {
+        topic: "Grand Finale: Virtual Base + Non-Virtual run() + Default Trap",
+        code:
+          `#include <iostream>
+using namespace std;
+struct Base {
+    int x;
+    Base(int v) : x(v)      { cout << "B" << x; }
+    virtual ~Base()          { cout << "~B"; }
+    virtual int f(int n=5)   { return x + n; }
+    void run(int n=10)       { cout << f(n); }
+};
+struct Mid : virtual Base {
+    int y;
+    Mid(int v) : Base(v*2), y(v) { cout << "M" << y; }
+    int f(int n=3) override      { return y * n; }
+};
+struct Leaf : Mid {
+    Leaf(int v) : Base(v), Mid(v) { cout << "L"; }
+    int f(int n=1) override {
+        return Mid::f(n) + Base::f(n);
+    }
+};
+int main() {
+    Leaf lf(4);
+    cout << " ";
+    Base* bp = &lf;
+    Mid* mp = &lf;
+    bp->run();
+    bp->run(2);
+    mp->run(3);
+    cout << " ";
+    cout << bp->f();
+    return 0;
+}`,
+        opts: [
+          `B8M4L 541419 29`,
+          `B4M4L 543019 29`,
+          `B4M4L 541419 29`,
+          `B4M4L 541419 9`
+        ],
+        correct: 2,
+        expl: `Virtual <code>Base</code>: Leaf controls→Base(4), x=4; Mid(4)→y=4. Construction: "B4M4L". <code>run(10)</code>: non-virtual, calls virtual <code>f(10)</code>→Leaf::f(10)=Mid::f(10)+Base::f(10)=4*10+(4+10)=54. <code>run(2)</code>: f(2)=4*2+(4+2)=14. <code>run(3)</code>: f(3)=4*3+(4+3)=19. <code>bp->f()</code>: default from Base*=5→f(5)=4*5+(4+5)=29.`
+      }
+
+    ]; /* end Q[] */
+
+
+    /* ══════════════════════════════════════════════════════
+       STATE
+    ══════════════════════════════════════════════════════ */
+    const state = {
+      cur: 0,
+      sel: new Array(Q.length).fill(null)
+    };
+
+    function getScore() {
+      return state.sel.reduce(function (s, v, i) {
+        return s + (v === Q[i].correct ? 1 : 0);
+      }, 0);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       ESCAPE & HIGHLIGHT (Single-Pass Tokenizer)
+    ══════════════════════════════════════════════════════ */
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function colorCode(raw) {
+      let s = esc(raw);
+      // VSCode Theme Regex Tokenizer
+      const regex = /(#\w+[^\n]*)|(&quot;.*?&quot;)|('(?:[^'\\]|\\.)')|\b(return|throw|try|catch|new|delete)\b|\b(class|struct|public|private|protected|virtual|override|final|using|namespace|static|const|void|int|long|double|string|bool|auto|nullptr|true|false|template|typename|explicit|this|inline)\b|\b([A-Z][A-Za-z0-9_]*)\b|\b([a-z_][A-Za-z0-9_]*)(?=\s*\()|\b(cout|cin|endl|std)\b|\b(\d+\.?\d*[Lf]?)\b/g;
+
+      return s.replace(regex, function (match, pp, st1, st2, ctrl, kw, cl, fn, std_objs, nu) {
+        if (pp) return '<span style="color:#8b949e">' + match + '</span>';
+        if (st1 || st2) return '<span style="color:#ce9178">' + match + '</span>';
+        if (ctrl) return '<span style="color:#c586c0">' + match + '</span>';
+        if (kw) return '<span style="color:#569cd6">' + match + '</span>';
+        if (cl) return '<span style="color:#4ec9b0">' + match + '</span>';
+        if (fn) return '<span style="color:#dcdcaa">' + match + '</span>';
+        if (std_objs) return '<span style="color:#58a6ff">' + match + '</span>';
+        if (nu) return '<span style="color:#b5cea8">' + match + '</span>';
+        return match;
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════
+       RENDER
+    ══════════════════════════════════════════════════════ */
+    function render() {
+      var i = state.cur;
+      var q = Q[i];
+      var sel = state.sel[i];
+      var answered = (sel !== null);
+      var correct = answered && (sel === q.correct);
+
+      /* ── topbar ── */
+      var answered_count = state.sel.filter(function (v) { return v !== null; }).length;
+      document.getElementById('prog-fill').style.width =
+        (answered_count / Q.length * 100).toFixed(1) + '%';
+      document.getElementById('sc').textContent = getScore();
+      document.getElementById('qn').textContent = i + 1;
+
+      /* ── options ── */
+      var labels = ['A', 'B', 'C', 'D'];
+      var optsHtml = '';
+      for (var oi = 0; oi < 4; oi++) {
+        var cls = 'opt-btn';
+        if (answered) {
+          if (oi === q.correct) cls += ' opt-correct';
+          else if (oi === sel) cls += ' opt-wrong';
+          else cls += ' opt-dim';
+        }
+        var dis = answered ? 'disabled' : '';
+        optsHtml += '<button class="' + cls + '" ' + dis +
+          ' onclick="choose(' + oi + ')">' +
+          '<span class="opt-lbl">' + labels[oi] + '</span>' +
+          '<span class="opt-val">' + esc(q.opts[oi]) + '</span>' +
+          '</button>';
+      }
+
+      /* ── feedback ── */
+      var fbVis = answered ? ' visible' : '';
+      var fbCls = correct ? ' fb-pass' : ' fb-fail';
+      var fbText = correct
+        ? '<span class="fb-ico">&#10004;</span> Correct!'
+        : '<span class="fb-ico">&#10006;</span> Wrong &mdash; correct was <strong>' +
+        labels[q.correct] + '</strong>';
+
+      /* ── explanation ── */
+      var exVis = answered ? ' visible' : '';
+
+      /* ── assemble card ── */
+      document.getElementById('card').innerHTML =
+        '<div class="c-head">' +
+        '<span class="c-qtag">Q' + (i + 1) + '</span>' +
+        '<span class="c-topic">' + esc(q.topic) + '</span>' +
+        '</div>' +
+        '<div class="c-code">' +
+        '<span class="c-code-lang">C++</span>' +
+        '<pre>' + colorCode(q.code) + '</pre>' +
+        '</div>' +
+        '<div class="c-prompt"><strong>&#9658;</strong> What does this program print to stdout?</div>' +
+        '<div class="c-opts">' + optsHtml + '</div>' +
+        '<div class="c-feedback' + fbCls + fbVis + '">' + fbText + '</div>' +
+        '<div class="c-expl' + exVis + '"><div class="expl-hd">// EXPLANATION</div>' + q.expl + '</div>';
+
+      /* ── nav buttons ── */
+      document.getElementById('btn-prev').disabled = (i === 0);
+      document.getElementById('btn-next').textContent =
+        (i === Q.length - 1) ? 'Finish ✓' : 'Next →';
+
+      renderDots();
+    }
+
+    /* ══════════════════════════════════════════════════════
+       DOT MAP
+    ══════════════════════════════════════════════════════ */
+    function renderDots() {
+      var html = '';
+      for (var i = 0; i < Q.length; i++) {
+        var cls = 'dot';
+        if (i === state.cur) {
+          cls += ' d-cur';
+        } else if (state.sel[i] !== null) {
+          cls += (state.sel[i] === Q[i].correct) ? ' d-ok' : ' d-bad';
+        }
+        html += '<div class="' + cls + '" onclick="jump(' + i + ')" title="Q' + (i + 1) + '"></div>';
+      }
+      document.getElementById('dots').innerHTML = html;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       ACTIONS
+    ══════════════════════════════════════════════════════ */
+    function choose(oi) {
+      if (state.sel[state.cur] !== null) return;
+      state.sel[state.cur] = oi;
+      render();
+    }
+
+    function go(dir) {
+      var next = state.cur + dir;
+      if (next >= Q.length) { showFinal(); return; }
+      if (next < 0) return;
+      state.cur = next;
+      render();
+    }
+
+    function jump(i) {
+      state.cur = i;
+      render();
+    }
+
+    /* ══════════════════════════════════════════════════════
+       FINAL SCREEN
+    ══════════════════════════════════════════════════════ */
+    function showFinal() {
+      document.getElementById('quiz').style.display = 'none';
+      var fin = document.getElementById('final');
+      fin.style.display = 'block';
+
+      var score = getScore();
+      var wrong = state.sel.filter(function (v, i) { return v !== null && v !== Q[i].correct; }).length;
+      var skipped = state.sel.filter(function (v) { return v === null; }).length;
+      var pct = Math.round(score / Q.length * 100);
+
+      var color = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+      var msg = pct >= 80 ? '🔥 C++ at compiler level. Insane.'
+        : pct >= 60 ? '⚡ Strong. A few deep traps caught you.'
+          : pct >= 40 ? '📚 Keep going — these are expert pitfalls.'
+            : '💀 Brutal but educational. Retry!';
+
+      fin.innerHTML =
+        '<div class="fin-h">Quiz Complete</div>' +
+        '<div class="fin-pct" style="color:' + color + '">' + pct + '%</div>' +
+        '<div class="fin-msg">' + msg + '</div>' +
+        '<div class="fin-grid">' +
+        '<div class="fin-box"><div class="fin-num" style="color:var(--green)">' + score + '</div><div class="fin-lbl">CORRECT</div></div>' +
+        '<div class="fin-box"><div class="fin-num" style="color:var(--red)">' + wrong + '</div><div class="fin-lbl">WRONG</div></div>' +
+        '<div class="fin-box"><div class="fin-num" style="color:var(--amber)">' + skipped + '</div><div class="fin-lbl">SKIPPED</div></div>' +
+        '</div>' +
+        '<button class="fin-btn" onclick="restart()">Restart Quiz</button>';
+    }
+
+    function restart() {
+      state.cur = 0;
+      for (var i = 0; i < state.sel.length; i++) state.sel[i] = null;
+      document.getElementById('final').style.display = 'none';
+      document.getElementById('quiz').style.display = 'block';
+      render();
+    }
+
+    /* ── BOOT ── */
+    render();
+  </script>
+</body>
+
+</html>
